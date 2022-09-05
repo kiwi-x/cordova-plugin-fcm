@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-fcm-ng"
-      version="8.3.0">
+      version="11.0.0">
     <name>FCMPluginNG</name>
     <description>Cordova FCM Plugin NG</description>
     <license>Apache 2.0</license>
@@ -50,14 +50,9 @@
             <data android:host="$PAGE_LINK_DOMAIN" android:scheme="https"/>
           </intent-filter>
         </activity>
-        <service android:name="com.gae.scaffolder.plugin.MyFirebaseMessagingService">
+        <service android:exported="false" android:stopWithTask="false" android:name="com.gae.scaffolder.plugin.MyFirebaseMessagingService">
           <intent-filter>
             <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-          </intent-filter>
-        </service>
-        <service android:name="com.gae.scaffolder.plugin.MyFirebaseInstanceIDService">
-          <intent-filter>
-            <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
           </intent-filter>
         </service>
       </config-file>
@@ -69,18 +64,11 @@
         </feature>
       </config-file>
 
-      <framework src="com.google.android.gms:play-services-tagmanager:16.0.8" />
-      <framework src="com.google.firebase:firebase-core:16.0.8" />
-      <framework src="com.google.firebase:firebase-messaging:17.5.0" />
-      <framework src="com.google.firebase:firebase-config:16.4.1" />
-      <framework src="com.google.firebase:firebase-perf:16.2.4" />
-      <framework src="com.google.firebase:firebase-dynamic-links:16.1.8" />
-
+      <framework src="com.google.firebase:firebase-bom:26.0.0" />
       <framework src="src/android/FCMPlugin.gradle" custom="true" type="gradleReference"/>
 
       <source-file src="src/android/FCMPlugin.java" target-dir="src/com/gae/scaffolder/plugin" />
       <source-file src="src/android/MyFirebaseMessagingService.java" target-dir="src/com/gae/scaffolder/plugin" />
-      <source-file src="src/android/MyFirebaseInstanceIDService.java" target-dir="src/com/gae/scaffolder/plugin" />
       <source-file src="src/android/FCMPluginActivity.java" target-dir="src/com/gae/scaffolder/plugin" />
     </platform>
 	
@@ -149,31 +137,7 @@
 				<pod name="Firebase/DynamicLinks" spec="= 7.11.0" />
 			</pods>
 		</podspec>
-		
-		<!-- FIREBASE LIBS -->
-    <!--
-		<header-file src="src/ios/firebase/Firebase.h" />
-		<framework src="src/ios/firebase/FirebaseAnalytics.framework" custom="true" />
-		<framework src="src/ios/firebase/FirebaseCore.framework" custom="true" />
-		<framework src="src/ios/firebase/FirebaseInstanceID.framework" custom="true" />
-		<framework src="src/ios/firebase/FirebaseMessaging.framework" custom="true" />
-		<framework src="src/ios/firebase/FirebaseDynamicLinks.framework" custom="true" />
-		<framework src="src/ios/firebase/GoogleInterchangeUtilities.framework" custom="true" />
-		<framework src="src/ios/firebase/GoogleIPhoneUtilities.framework" custom="true" />
-		<framework src="src/ios/firebase/GoogleSymbolUtilities.framework" custom="true" />
-		<framework src="src/ios/firebase/GoogleUtilities.framework" custom="true" />
-    -->
-			
-		<!-- OTHER NEEDED LIBS -->
-    <!--
-		<framework src="libc++.tbd" />
-		<framework src="libz.tbd" />
-		<framework src="AddressBook.framework" />
-		<framework src="libsqlite3.0.tbd" />
-		<framework src="libz.tbd" />
-		<framework src="Security.framework" />
-    -->
-
+    
     </platform>
 	
 	<!-- COPY FCM CONFIG FILES TO PLATFORM AFTER PLUGIN INSTALL OR PLATFORM PREPARE -->
