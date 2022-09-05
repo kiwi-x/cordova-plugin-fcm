@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -13,7 +13,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.apache.cordova.CallbackContext;
@@ -27,6 +27,15 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import android.os.Build;
+import android.os.Bundle;
+import android.app.Notification;
+import android.app.NotificationChannel;
+
+// -- for new token
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.installations.InstallationTokenResult;    
 
 public class FCMPlugin extends CordovaPlugin {
 
@@ -54,12 +63,30 @@ public class FCMPlugin extends CordovaPlugin {
     Log.d(TAG, "Initialize");
     FirebaseMessaging.getInstance().subscribeToTopic("android");
     FirebaseMessaging.getInstance().subscribeToTopic("all");
+
     Log.d(TAG, "Starting Analytics");
     mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
     domainUriPrefix = preferences.getString("DYNAMIC_LINK_URIPREFIX", "");
     Log.d(TAG, "Dynamic Link Uri Prefix: " + domainUriPrefix);
 
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+      CharSequence name = preferences.getString("FireBaseDefaultChannelName", "default");
+      String description = preferences.getString("FireBaseDefaultChannelDescription", "Default");
+      String channelId = preferences.getString("FireBaseDefaultChannelChannelId", "apicodo_default");
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+
+      channel.setDescription(description);
+      // Register the channel with the system; you can't change the importance
+      // or other notification behaviors after this
+      NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+      notificationManager.createNotificationChannel(channel);
+    }
+  
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         Log.d(TAG, "Check if there are notifications");
@@ -95,13 +122,22 @@ public class FCMPlugin extends CordovaPlugin {
       else if (action.equals("getToken")) {
         cordova.getActivity().runOnUiThread(new Runnable() {
           public void run() {
-            try {
-              String token = FirebaseInstanceId.getInstance().getToken();
-              callbackContext.success(FirebaseInstanceId.getInstance().getToken());
-              Log.d(TAG, "Token: " + token);
-            } catch (Exception e) {
-              Log.d(TAG, "Error retrieving token");
-            }
+            // FirebaseInstallations fbi = FirebaseInstallations.getInstance();
+            FirebaseMessaging fbm = FirebaseMessaging.getInstance();
+            Task<String> task = fbm.getToken();
+            task.addOnSuccessListener(new OnSuccessListener<String>() {
+                @Override
+                public void onSuccess(String token) {
+                    callbackContext.success(token);
+                    Log.d(TAG, "Token: " + token);
+                  }
+            });
+            task.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                  Log.d(TAG, "Error retrieving token");
+                }
+            });              
           }
         });
       }

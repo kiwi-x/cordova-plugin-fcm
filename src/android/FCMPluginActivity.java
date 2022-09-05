@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -18,7 +18,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FCMPluginActivity extends Activity {
+public class FCMPluginActivity extends AppCompatActivity {
   private static String TAG = "FCMPluginActivity";
 
   /*
