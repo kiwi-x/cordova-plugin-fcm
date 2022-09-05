@@ -18,7 +18,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FCMPluginActivity extends AppCompatActivity {
+public class FCMPluginActivity extends Activity {
   private static String TAG = "FCMPluginActivity";
 
   /*
