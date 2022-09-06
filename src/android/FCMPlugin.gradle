@@ -19,7 +19,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:30.3.2')
 
     implementation 'com.google.firebase:firebase-auth'
-    implementation "com.google.android.gms:play-services-tagmanager"
     implementation "com.google.firebase:firebase-core"
     implementation "com.google.firebase:firebase-messaging"
     implementation "com.google.firebase:firebase-config"
