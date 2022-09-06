@@ -17,6 +17,14 @@ repositories {
 }
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:30.3.2')
+
+    implementation 'com.google.firebase:firebase-auth'
+    implementation "com.google.android.gms:play-services-tagmanager"
+    implementation "com.google.firebase:firebase-core"
+    implementation "com.google.firebase:firebase-messaging"
+    implementation "com.google.firebase:firebase-config"
+    implementation "com.google.firebase:firebase-perf"
+
 }
 // apply plugin: 'com.google.gms.google-services'
 // class must be used instead of id(string) to be able to apply plugin from non-root gradle file
