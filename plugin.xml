@@ -64,7 +64,7 @@
         </feature>
       </config-file>
 
-      <framework src="com.google.firebase:firebase-bom:26.0.0" />
+      <framework src="com.google.firebase:firebase-bom:30.3.2" />
       <framework src="src/android/FCMPlugin.gradle" custom="true" type="gradleReference"/>
 
       <source-file src="src/android/FCMPlugin.java" target-dir="src/com/gae/scaffolder/plugin" />
