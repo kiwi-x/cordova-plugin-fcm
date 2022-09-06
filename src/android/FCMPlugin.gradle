@@ -16,6 +16,9 @@ repositories {
     }
 }
 dependencies {
+
+    implementation "com.google.android.gms:play-services-tagmanager:18.0.1"
+
     implementation platform('com.google.firebase:firebase-bom:30.3.2')
 
     implementation 'com.google.firebase:firebase-auth'
