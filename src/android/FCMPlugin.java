@@ -10,7 +10,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.analytics.FirebaseAnalytics;
+// import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.installations.FirebaseInstallations;
@@ -41,7 +41,7 @@ public class FCMPlugin extends CordovaPlugin {
 
   private static final String TAG = "FCMPlugin";
 
-  private FirebaseAnalytics mFirebaseAnalytics;
+  // private FirebaseAnalytics mFirebaseAnalytics;
 
   private String domainUriPrefix;
   public static String notificationCallBackLink = "FCMPlugin.getDynamicLinkReceived";
@@ -65,7 +65,7 @@ public class FCMPlugin extends CordovaPlugin {
     FirebaseMessaging.getInstance().subscribeToTopic("all");
 
     Log.d(TAG, "Starting Analytics");
-    mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+    // mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
     domainUriPrefix = preferences.getString("DYNAMIC_LINK_URIPREFIX", "");
     Log.d(TAG, "Dynamic Link Uri Prefix: " + domainUriPrefix);
@@ -171,6 +171,7 @@ public class FCMPlugin extends CordovaPlugin {
           public void run() {
             try {
               FirebaseMessaging.getInstance().unsubscribeFromTopic(args.getString(0));
+              // callbackContemFirebaseAnalyticsxt.success();
               callbackContext.success();
             } catch (Exception e) {
               callbackContext.error(e.getMessage());
@@ -314,7 +315,7 @@ public class FCMPlugin extends CordovaPlugin {
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          mFirebaseAnalytics.logEvent(name, bundle);
+          // mFirebaseAnalytics.logEvent(name, bundle);
           callbackContext.success();
         } catch (Exception e) {
           callbackContext.error(e.getMessage());
@@ -327,7 +328,7 @@ public class FCMPlugin extends CordovaPlugin {
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          mFirebaseAnalytics.setUserId(id);
+          // mFirebaseAnalytics.setUserId(id);
           callbackContext.success();
         } catch (Exception e) {
           callbackContext.error(e.getMessage());
@@ -340,7 +341,7 @@ public class FCMPlugin extends CordovaPlugin {
     cordova.getThreadPool().execute(new Runnable() {
       public void run() {
         try {
-          mFirebaseAnalytics.setUserProperty(name, value);
+          // mFirebaseAnalytics.setUserProperty(name, value);
           callbackContext.success();
         } catch (Exception e) {
           callbackContext.error(e.getMessage());
