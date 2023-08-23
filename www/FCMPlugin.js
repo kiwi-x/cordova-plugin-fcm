@@ -26,6 +26,15 @@ FCMPlugin.prototype.getToken = function( success, error ){
 	exec(success, error, "FCMPlugin", 'getToken', []);
 }
 
+FCMPlugin.prototype.hasPermission = function (success, error) {
+    exec(success, error, "FirebasePlugin", "hasPermission", []);
+};
+
+FCMPlugin.prototype.grantPermission = function (success, error, requestWithProvidesAppNotificationSettings) {
+    exec(success, error, "FirebasePlugin", "grantPermission", [requestWithProvidesAppNotificationSettings]);
+};
+
+
 // DEFAULT NOTIFICATION CALLBACK //
 FCMPlugin.prototype.onNotificationReceived = function(payload){
 	console.log("Received push notification")

@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 8.3.1 (28/01/2021)
+- Added Android 13 Support
+
 ### Version 8.3.0 (28/01/2021)
 - Fix Dynamic Link on iOS (when app is closed)
 - Refactor on Dynamic Link handler

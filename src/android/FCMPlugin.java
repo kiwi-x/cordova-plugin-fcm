@@ -1,11 +1,15 @@
 package com.gae.scaffolder.plugin;
 
 import android.app.NotificationManager;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.ActivityCompat;
+
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -19,6 +23,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +32,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.lang.reflect.Method;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -52,6 +58,13 @@ public class FCMPlugin extends CordovaPlugin {
   public static String tokenRefreshCallBack = "FCMPlugin.onTokenRefreshReceived";
   public static Boolean notificationCallBackReady = false;
   public static Map<String, Object> lastPush = null;
+  private static Activity cordovaActivity = null;
+
+  protected static final String POST_NOTIFICATIONS = "POST_NOTIFICATIONS";
+  protected static final int POST_NOTIFICATIONS_PERMISSION_REQUEST_ID = 1;
+  protected static FCMPlugin instance = null;
+  private static CallbackContext postNotificationPermissionRequestCallbackContext;
+
 
   public FCMPlugin() {
   }
@@ -59,6 +72,8 @@ public class FCMPlugin extends CordovaPlugin {
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     final Context context = cordova.getActivity().getApplicationContext();
     super.initialize(cordova, webView);
+    cordovaActivity = this.cordova.getActivity();
+    instance = this;
     gWebView = webView;
     Log.d(TAG, "Initialize");
     FirebaseMessaging.getInstance().subscribeToTopic("android");
@@ -109,6 +124,119 @@ public class FCMPlugin extends CordovaPlugin {
     });
   }
 
+  private void executeGlobalJavascript(final String jsString){
+    if(cordovaActivity == null) return;
+    cordovaActivity.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+            webView.loadUrl("javascript:" + jsString);
+        }
+    });
+  }
+
+  private String escapeDoubleQuotes(String string){
+    String escapedString = string.replace("\"", "\\\"");
+    escapedString = escapedString.replace("%22", "\\%22");
+    return escapedString;
+  }
+
+  protected void logErrorToWebview(String msg){
+    Log.e(TAG, msg);
+    executeGlobalJavascript("console.error(\""+TAG+"[native]: "+escapeDoubleQuotes(msg)+"\")");
+  }
+
+  protected static void handleExceptionWithoutContext(Exception e){
+    String msg = e.toString();
+    Log.e(TAG, msg);
+    if (instance != null) {
+        instance.logErrorToWebview(msg);
+    }
+  }
+
+  private int conformBooleanForPluginResult(boolean result){
+    return result ? 1 : 0;
+  }
+
+  protected String qualifyPermission(String permission){
+    if(permission.startsWith("android.permission.")){
+        return permission;
+    }else{
+        return "android.permission."+permission;
+    }
+  }
+
+  protected void sendEmptyPluginResultAndKeepCallback(CallbackContext callbackContext){
+    PluginResult pluginresult = new PluginResult(PluginResult.Status.NO_RESULT);
+    pluginresult.setKeepCallback(true);
+    callbackContext.sendPluginResult(pluginresult);
+  }
+
+
+  protected boolean hasRuntimePermission(String permission) throws Exception{
+    boolean hasRuntimePermission = true;
+    String qualifiedPermission = qualifyPermission(permission);
+    Method method = null;
+    try {
+        method = cordova.getClass().getMethod("hasPermission", qualifiedPermission.getClass());
+        Boolean bool = (Boolean) method.invoke(cordova, qualifiedPermission);
+        hasRuntimePermission = bool.booleanValue();
+    } catch (NoSuchMethodException e) {
+        Log.w(TAG, "Cordova v" + CordovaWebView.CORDOVA_VERSION + " does not support runtime permissions so defaulting to GRANTED for " + permission);
+    }
+    return hasRuntimePermission;
+  }
+
+  private void hasPermission(final CallbackContext callbackContext) {
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+            try {
+                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
+                boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
+
+                boolean hasRuntimePermission = true;
+                if(Build.VERSION.SDK_INT >= 33){ // Android 13+
+                    hasRuntimePermission = hasRuntimePermission(POST_NOTIFICATIONS);
+                }
+
+                callbackContext.success(conformBooleanForPluginResult(areNotificationsEnabled && hasRuntimePermission));
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot ask for permissions.");
+            }
+        }
+    });
+  }
+
+
+  protected void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions) throws Exception{
+    try {
+        java.lang.reflect.Method method = cordova.getClass().getMethod("requestPermissions", org.apache.cordova.CordovaPlugin.class ,int.class, java.lang.String[].class);
+        method.invoke(cordova, plugin, requestCode, permissions);
+    } catch (NoSuchMethodException e) {
+        throw new Exception("requestPermissions() method not found in CordovaInterface implementation of Cordova v" + CordovaWebView.CORDOVA_VERSION);
+    }
+}
+
+  private void grantPermission(final CallbackContext callbackContext) {
+      CordovaPlugin plugin = this;
+      cordova.getThreadPool().execute(new Runnable() {
+          public void run() {
+              try {
+                  if(Build.VERSION.SDK_INT >= 33){ // Android 13+
+                      boolean hasRuntimePermission = hasRuntimePermission(POST_NOTIFICATIONS);
+                      if(!hasRuntimePermission){
+                          String[] permissions = new String[]{qualifyPermission(POST_NOTIFICATIONS)};
+                          postNotificationPermissionRequestCallbackContext = callbackContext;
+                          requestPermissions(plugin, POST_NOTIFICATIONS_PERMISSION_REQUEST_ID, permissions);
+                          sendEmptyPluginResultAndKeepCallback(callbackContext);
+                      }
+                  }
+
+              } catch (Exception e) {
+                  Log.e(TAG, "Cannot grant permissions.");
+              }
+          }
+      });
+  }
   public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
     Log.d(TAG, "Execute: " + action);
@@ -140,6 +268,12 @@ public class FCMPlugin extends CordovaPlugin {
             });              
           }
         });
+      }
+      else if (action.equals("hasPermission")) {
+        this.hasPermission(callbackContext);
+      } 
+      else if (action.equals("grantPermission")) {
+        this.grantPermission(callbackContext);
       }
       // NOTIFICATION CALLBACK REGISTER //
       else if (action.equals("registerNotification")) {
