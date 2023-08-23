@@ -206,7 +206,6 @@ public class FCMPlugin extends CordovaPlugin {
     });
   }
 
-
   protected void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions) throws Exception{
     try {
         java.lang.reflect.Method method = cordova.getClass().getMethod("requestPermissions", org.apache.cordova.CordovaPlugin.class ,int.class, java.lang.String[].class);

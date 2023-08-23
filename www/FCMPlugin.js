@@ -27,11 +27,11 @@ FCMPlugin.prototype.getToken = function( success, error ){
 }
 
 FCMPlugin.prototype.hasPermission = function (success, error) {
-    exec(success, error, "FirebasePlugin", "hasPermission", []);
+    exec(success, error, "FCMPlugin", "hasPermission", []);
 };
 
 FCMPlugin.prototype.grantPermission = function (success, error, requestWithProvidesAppNotificationSettings) {
-    exec(success, error, "FirebasePlugin", "grantPermission", [requestWithProvidesAppNotificationSettings]);
+    exec(success, error, "FCMPlugin", "grantPermission", [requestWithProvidesAppNotificationSettings]);
 };
 
 
