@@ -147,7 +147,7 @@ static FCMPlugin *fcmPluginInstance;
     NSString* name = [command.arguments objectAtIndex:0];
     NSDictionary* parameters = [command.arguments objectAtIndex:1];
     
-    [FIRAnalytics logEventWithName:name parameters:parameters];
+    //[FIRAnalytics logEventWithName:name parameters:parameters];
     
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -158,7 +158,7 @@ static FCMPlugin *fcmPluginInstance;
     
     NSString* id = [command.arguments objectAtIndex:0];
     
-    [FIRAnalytics setUserID:id];
+    //[FIRAnalytics setUserID:id];
     
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -170,7 +170,7 @@ static FCMPlugin *fcmPluginInstance;
     NSString* name = [command.arguments objectAtIndex:0];
     NSString* value = [command.arguments objectAtIndex:1];
     
-    [FIRAnalytics setUserPropertyString:value forName:name];
+    //[FIRAnalytics setUserPropertyString:value forName:name];
     
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
