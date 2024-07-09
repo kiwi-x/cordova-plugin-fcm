@@ -12,8 +12,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,35 +29,6 @@ public class FCMPluginActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Log.d(TAG, "onCreate");
-
-    /*
-     * Handle deepLink (app closed/background)
-     */
-    FirebaseDynamicLinks.getInstance()
-      .getDynamicLink(getIntent())
-      .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
-        @Override
-        public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
-          Uri deepLink = null;
-          if (pendingDynamicLinkData != null) {
-            deepLink = pendingDynamicLinkData.getLink();
-          }
-          if (deepLink != null) {
-            Log.d(TAG, "getDynamicLink:onSuccess -> " + deepLink);
-            Map<String, Object> linkData = new HashMap<String, Object>();
-            linkData.put("deepLink", deepLink);
-            linkData.put("clickTimestamp", pendingDynamicLinkData.getClickTimestamp());
-            linkData.put("minimumAppVersion", pendingDynamicLinkData.getMinimumAppVersion());
-            FCMPlugin.sendDynLink(linkData);
-          }
-        }
-      })
-      .addOnFailureListener(this, new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          Log.d(TAG, "Error: getDynamicLink:onFailure", e);
-        }
-      });
 
     /*
      * Open received push notification.

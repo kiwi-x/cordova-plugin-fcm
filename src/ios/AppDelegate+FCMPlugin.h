@@ -14,6 +14,5 @@
 @interface AppDelegate (FCMPlugin)
 
 + (NSData*)getLastPush;
-+ getLastLink;
 
 @end

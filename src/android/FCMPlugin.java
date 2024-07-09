@@ -14,9 +14,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-// import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.installations.FirebaseInstallations;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -47,10 +44,8 @@ public class FCMPlugin extends CordovaPlugin {
 
   private static final String TAG = "FCMPlugin";
 
-  // private FirebaseAnalytics mFirebaseAnalytics;
-
-  private String domainUriPrefix;
-  public static String notificationCallBackLink = "FCMPlugin.getDynamicLinkReceived";
+  // private String domainUriPrefix;
+  // public static String notificationCallBackLink = "FCMPlugin.getDynamicLinkReceived";
   public static Map<String, Object> lastLink = null;
 
   public static CordovaWebView gWebView;
@@ -80,10 +75,6 @@ public class FCMPlugin extends CordovaPlugin {
     FirebaseMessaging.getInstance().subscribeToTopic("all");
 
     Log.d(TAG, "Starting Analytics");
-    // mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-
-    domainUriPrefix = preferences.getString("DYNAMIC_LINK_URIPREFIX", "");
-    Log.d(TAG, "Dynamic Link Uri Prefix: " + domainUriPrefix);
 
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
@@ -279,8 +270,8 @@ public class FCMPlugin extends CordovaPlugin {
         notificationCallBackReady = true;
         cordova.getActivity().runOnUiThread(new Runnable() {
           public void run() {
-            if (lastLink != null) FCMPlugin.sendDynLink(lastLink);
-            lastLink = null;
+            // if (lastLink != null) FCMPlugin.sendDynLink(lastLink);
+            // lastLink = null;
             if (lastPush != null) FCMPlugin.sendPushPayload(lastPush);
             lastPush = null;
             callbackContext.success();
@@ -311,61 +302,6 @@ public class FCMPlugin extends CordovaPlugin {
             }
           }
         });
-      } else if (action.equals("logEvent")) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            try {
-              logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
-              callbackContext.success();
-            } catch (Exception e) {
-              callbackContext.error(e.getMessage());
-            }
-          }
-        });
-      } else if (action.equals("setUserId")) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            try {
-              setUserId(callbackContext, args.getString(0));
-              callbackContext.success();
-            } catch (Exception e) {
-              callbackContext.error(e.getMessage());
-            }
-          }
-        });
-      } else if (action.equals("setUserProperty")) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            try {
-              setUserProperty(callbackContext, args.getString(0), args.getString(1));
-              callbackContext.success();
-            } catch (Exception e) {
-              callbackContext.error(e.getMessage());
-            }
-          }
-        });
-      } else if (action.equals("clearAllNotifications")) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            try {
-              clearAllNotifications(callbackContext);
-              callbackContext.success();
-            } catch (Exception e) {
-              callbackContext.error(e.getMessage());
-            }
-          }
-        });
-      } else if (action.equals("getDynamicLink")) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            try {
-              getDynamicLink();
-              callbackContext.success();
-            } catch (Exception e) {
-              callbackContext.error(e.getMessage());
-            }
-          }
-        });
       } else {
         callbackContext.error("Error: method not found");
         return false;
@@ -376,27 +312,6 @@ public class FCMPlugin extends CordovaPlugin {
       return false;
     }
     return true;
-  }
-
-  public static void sendDynLink(Map<String, Object> dynlink) {
-    Log.d(TAG, "sendDynLink");
-    try {
-      JSONObject jo = new JSONObject();
-      for (String key : dynlink.keySet()) {
-        jo.put(key, dynlink.get(key));
-      }
-      String callBack = "javascript:" + notificationCallBackLink + "(" + jo.toString() + ")";
-      if (notificationCallBackReady && gWebView != null) {
-        Log.d(TAG, "Dynamic Link to view: " + callBack);
-        gWebView.sendJavascript(callBack);
-      } else {
-        Log.d(TAG, "View not ready. Dynamic Link saved: " + callBack);
-        lastLink = dynlink;
-      }
-    } catch (Exception e) {
-      Log.d(TAG, "Error: sendDynLink:Exception", e);
-      lastLink = dynlink;
-    }
   }
 
   public static void sendPushPayload(Map<String, Object> payload) {
@@ -428,108 +343,6 @@ public class FCMPlugin extends CordovaPlugin {
     } catch (Exception e) {
       Log.d(TAG, "Error: sendRefreshToken: " + e.getMessage());
     }
-  }
-
-  public void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
-    throws JSONException {
-    final Bundle bundle = new Bundle();
-    Iterator iter = params.keys();
-    while (iter.hasNext()) {
-      String key = (String) iter.next();
-      Object value = params.get(key);
-
-      if (value instanceof Integer || value instanceof Double) {
-        bundle.putFloat(key, ((Number) value).floatValue());
-      } else {
-        bundle.putString(key, value.toString());
-      }
-    }
-
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
-        try {
-          // mFirebaseAnalytics.logEvent(name, bundle);
-          callbackContext.success();
-        } catch (Exception e) {
-          callbackContext.error(e.getMessage());
-        }
-      }
-    });
-  }
-
-  public void setUserId(final CallbackContext callbackContext, final String id) {
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
-        try {
-          // mFirebaseAnalytics.setUserId(id);
-          callbackContext.success();
-        } catch (Exception e) {
-          callbackContext.error(e.getMessage());
-        }
-      }
-    });
-  }
-
-  public void setUserProperty(final CallbackContext callbackContext, final String name, final String value) {
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
-        try {
-          // mFirebaseAnalytics.setUserProperty(name, value);
-          callbackContext.success();
-        } catch (Exception e) {
-          callbackContext.error(e.getMessage());
-        }
-      }
-    });
-  }
-
-  public void clearAllNotifications(final CallbackContext callbackContext) {
-    cordova.getThreadPool().execute(new Runnable() {
-      public void run() {
-        try {
-          Context context = cordova.getActivity();
-          NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-          nm.cancelAll();
-          callbackContext.success();
-        } catch (Exception e) {
-          callbackContext.error(e.getMessage());
-        }
-      }
-    });
-  }
-
-  private void getDynamicLink() {
-    respondWithDynamicLink(cordova.getActivity().getIntent());
-  }
-
-  // App opened from Play Store (new installation)
-  private void respondWithDynamicLink(Intent intent) {
-    Log.d(TAG, "respondWithDynamicLink");
-    FirebaseDynamicLinks.getInstance()
-      .getDynamicLink(intent)
-      .addOnSuccessListener(new OnSuccessListener<PendingDynamicLinkData>() {
-        @Override
-        public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
-          Uri deepLink = null;
-          if (pendingDynamicLinkData != null) {
-            deepLink = pendingDynamicLinkData.getLink();
-            if (deepLink != null) {
-              Map<String, Object> linkData = new HashMap<String, Object>();
-              linkData.put("deepLink", deepLink);
-              linkData.put("clickTimestamp", pendingDynamicLinkData.getClickTimestamp());
-              linkData.put("minimumAppVersion", pendingDynamicLinkData.getMinimumAppVersion());
-              linkData.put("newInstall", true); // Send attribute to identify new install
-              FCMPlugin.sendDynLink(linkData);
-            }
-          }
-        }
-      })
-      .addOnFailureListener(new OnFailureListener() {
-        @Override
-        public void onFailure(@NonNull Exception e) {
-          Log.d(TAG, "Error: respondWithDynamicLink:addOnFailureListener", e);
-        }
-      });
   }
 
   @Override
