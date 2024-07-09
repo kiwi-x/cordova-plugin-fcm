@@ -127,47 +127,6 @@ Send a push notification to a single device or topic.
  - If the user taps the notification, the application comes to foreground and the notification data is received in the JavaScript callback.
  - If the user does not tap the notification but opens the applicacion, nothing happens until the notification is tapped.
 
-## Usage of Google Analytics Methods
-Every method returns a promise that fulfills when a call was successful.
-
-### logEvent(_name_, _params_)
-Logs an app event.
-```js
-FCMPluginNG.logEvent("my_event", {param1: "value1"});
-```
-
-Be aware of [automatically collected events](https://support.google.com/firebase/answer/6317485).
-
-### setUserId(_id_)
-Sets the user ID property.
-```js
-FCMPluginNG.setUserId("12345");
-```
-This feature must be used in accordance with [Google's Privacy Policy](https://www.google.com/policies/privacy).
-
-### setUserProperty(_name_, _value_)
-Sets a user property to a given value.
-```js
-FCMPluginNG.setUserProperty("name1", "value1");
-```
-
-## Dynamic Links
-
-### getDynamicLink
-
-Only works on Android.
-
-```js
-FCMPluginNG.getDynamicLink();
-```
-
-### onDynamicLink
-
-Only works on iOS
-
-```js
-FCMPluginNG.onDynamicLink();
-```
 
 ## License
 ```
