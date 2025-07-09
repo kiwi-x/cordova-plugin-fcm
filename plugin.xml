@@ -19,7 +19,7 @@
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   id="cordova-plugin-fcm-ng"
-  version="13.0.1">
+  version="13.0.2">
   <name>FCMPluginNG</name>
   <description>Cordova FCM Plugin NG</description>
   <license>Apache 2.0</license>
@@ -39,7 +39,7 @@
   <!-- ANDROID CONFIGURATION -->
   <platform name="android">
 
-    <preference name="ANDROID_FIREBASE_BOM_VERSION" default="32.5.0" />
+    <preference name="ANDROID_FIREBASE_BOM_VERSION" default="32.8.1" />
 
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <activity android:exported="true" android:name="com.gae.scaffolder.plugin.FCMPluginActivity"

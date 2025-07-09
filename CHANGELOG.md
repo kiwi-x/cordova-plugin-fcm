@@ -1,5 +1,21 @@
 # Changelog
 
+### Version 13.1.0 (09/07/2025)
+- Upgraded Android Firebase BOM to 32.8.1
+
+### Version 13.0.0 (26/08/2024)
+- Upgraded iOS Firebase POD to 10.24
+
+### Version 12.0.0 (28/08/2023)
+- Fixed Android 13 Support
+- Upgraded Android Firebase BOM to 30.3.2
+
+### Version 11.0.0 (05/09/2022)
+- Upgraded Android Firebase BOM to 30.3.2
+
+### Version 11.0.0 (05/09/2022)
+- Upgraded Android Firebase BOM to 30.3.2
+
 ### Version 8.3.1 (28/01/2021)
 - Added Android 13 Support
 
@@ -8,7 +24,6 @@
 - Refactor on Dynamic Link handler
 - Add FCM tag to identify logs
 - Code indent
-
 
 ### Version 8.2.0 (10/12/2020)
 - Fixed Dynamic Link. New function getDynamicLink. Fixed open link on
