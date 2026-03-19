@@ -43,7 +43,7 @@ var PLATFORM = {
             ANDROID_DIR + '/assets/www/google-services.json',
             'www/google-services.json'
         ],
-        stringsXml: ANDROID_DIR + '/app/src/main/res/values/strings.xml'
+        stringsXml: ANDROID_DIR + '/app/src/main/res/values/cdv_strings.xml'
     }
 };
 
@@ -52,6 +52,12 @@ if (directoryExists(IOS_DIR)) {
     copyKey(PLATFORM.IOS);
 }
 if (directoryExists(ANDROID_DIR)) {
+    if (! fs.existsSync(PLATFORM.ANDROID.stringsXml) ) {
+        // before cordova android 15 - different structure for string resources
+        if (fs.existsSync(ANDROID_DIR + '/app/src/main/res/values/strings.xml')) {
+            PLATFORM.ANDROID.stringsXml = ANDROID_DIR + '/app/src/main/res/values/strings.xml';
+        }
+    }
     copyKey(PLATFORM.ANDROID, updateStringsXml)
 }
 
