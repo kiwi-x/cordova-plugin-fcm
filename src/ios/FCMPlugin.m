@@ -56,6 +56,35 @@ static FCMPlugin *fcmPluginInstance;
     }];
 }
 
+- (void) getInitialPushPayload:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"FCM -> Get Initial Push Payload");
+    [self.commandDelegate runInBackground:^{
+        NSData* payload = [AppDelegate consumeInitialPushPayload];
+        if (payload == nil) {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:nil];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+
+        NSError *error = nil;
+        id jsonObject = [NSJSONSerialization JSONObjectWithData:payload options:0 error:&error];
+        if (error != nil || ![jsonObject isKindOfClass:[NSDictionary class]]) {
+            NSString *payloadString = [[NSString alloc] initWithData:payload encoding:NSUTF8StringEncoding];
+            NSString *errorMessage = [NSString stringWithFormat:@"Unable to parse initial push payload: %@ => '%@'", error.localizedDescription, payloadString];
+            NSLog(@"FCM -> %@", errorMessage);
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION messageAsString:errorMessage];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            return;
+        }
+
+        NSDictionary *payloadDictionary = (NSDictionary *)jsonObject;
+        NSLog(@"FCM -> Initial Push Payload %@", payloadDictionary);
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:payloadDictionary];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 // UN/SUBSCRIBE TOPIC //
 - (void) subscribeToTopic:(CDVInvokedUrlCommand *)command 
 {

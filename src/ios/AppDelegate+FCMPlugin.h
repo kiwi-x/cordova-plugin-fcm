@@ -14,5 +14,7 @@
 @interface AppDelegate (FCMPlugin)
 
 + (NSData*)getLastPush;
++ (void)setInitialPushPayload:(NSData*)payload;
++ (NSData*)consumeInitialPushPayload;
 
 @end

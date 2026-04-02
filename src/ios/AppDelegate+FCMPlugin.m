@@ -36,6 +36,7 @@
 @implementation AppDelegate (MCPlugin)
 
 static NSData *lastPush;
+static NSData *initialPushPayload;
 NSString *const kGCMMessageIDKey = @"gcm.message_id";
 
 + (void)load
@@ -131,6 +132,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                                                          error:&error];
     NSLog(@"FCM -> APP WAS CLOSED DURING PUSH RECEPTION Saved data: %@", jsonData);
     lastPush = jsonData;
+    [AppDelegate setInitialPushPayload:jsonData];
     
     
     completionHandler();
@@ -165,6 +167,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                                                              error:&error];
         NSLog(@"FCM -> APP WAS CLOSED DURING PUSH RECEPTION Saved data: %@", jsonData);
         lastPush = jsonData;
+        [AppDelegate setInitialPushPayload:jsonData];
     }
 }
 // [END receive_message in background] iOS < 10]
@@ -283,6 +286,21 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
     NSData* returnValue = lastPush;
     lastPush = nil;
+    return returnValue;
+}
+
++(void)setInitialPushPayload:(NSData*)payload
+{
+    initialPushPayload = payload;
+}
+
++(NSData*)consumeInitialPushPayload
+{
+    NSData* returnValue = initialPushPayload;
+    initialPushPayload = nil;
+    if (returnValue != nil) {
+        lastPush = nil;
+    }
     return returnValue;
 }
 
