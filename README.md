@@ -50,6 +50,24 @@ FCMPluginNG.getToken(function(token){
 });
 ```
 
+#### Get initial push payload
+
+```javascript
+//FCMPluginNG.getInitialPushPayload( successCallback(data), errorCallback(err) );
+//Returns the full payload of the notification tap that opened the app.
+//The payload is consumed on first read, so call this as early as possible after deviceready.
+FCMPluginNG.getInitialPushPayload(function(data){
+    if (!data) {
+        return;
+    }
+
+    // Evaluate the full payload in your app code and decide where to route.
+    // This keeps the plugin generic and avoids coupling native code to a
+    // single property like "untrackedUri".
+    alert(JSON.stringify(data));
+});
+```
+
 #### Subscribe to topic
 
 ```javascript
@@ -79,6 +97,24 @@ FCMPluginNG.onNotification(function(data){
       //Notification was received in foreground. Maybe the user needs to be notified.
       alert( JSON.stringify(data) );
     }
+});
+```
+
+#### Recommended cold-start order
+
+```javascript
+document.addEventListener("deviceready", function () {
+    FCMPluginNG.getInitialPushPayload(function (data) {
+        if (data && data.wasTapped) {
+            // Resolve your target route here before loading the rest of the app.
+        }
+    });
+
+    FCMPluginNG.onNotification(function (data) {
+        if (data.wasTapped) {
+            // Handle taps while the app is already running.
+        }
+    });
 });
 ```
 

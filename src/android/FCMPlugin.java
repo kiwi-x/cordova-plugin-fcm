@@ -53,6 +53,7 @@ public class FCMPlugin extends CordovaPlugin {
   public static String tokenRefreshCallBack = "FCMPlugin.onTokenRefreshReceived";
   public static Boolean notificationCallBackReady = false;
   public static Map<String, Object> lastPush = null;
+  public static Map<String, Object> initialPush = null;
   private static Activity cordovaActivity = null;
 
   protected static final String POST_NOTIFICATIONS = "POST_NOTIFICATIONS";
@@ -108,6 +109,7 @@ public class FCMPlugin extends CordovaPlugin {
                 data.put(key, value);
               }
             }
+            FCMPlugin.setInitialPushPayload(data);
             FCMPlugin.sendPushPayload(data);
           }
         }
@@ -160,6 +162,31 @@ public class FCMPlugin extends CordovaPlugin {
     PluginResult pluginresult = new PluginResult(PluginResult.Status.NO_RESULT);
     pluginresult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginresult);
+  }
+
+  private static JSONObject toJSONObject(Map<String, Object> payload) throws JSONException {
+    JSONObject jo = new JSONObject();
+    for (String key : payload.keySet()) {
+      jo.put(key, payload.get(key));
+    }
+    return jo;
+  }
+
+  public static void setInitialPushPayload(Map<String, Object> payload) {
+    if (payload == null) {
+      initialPush = null;
+      return;
+    }
+    initialPush = new HashMap<String, Object>(payload);
+  }
+
+  public static Map<String, Object> consumeInitialPushPayload() {
+    Map<String, Object> payload = initialPush;
+    initialPush = null;
+    if (payload != null) {
+      lastPush = null;
+    }
+    return payload;
   }
 
 
@@ -259,6 +286,23 @@ public class FCMPlugin extends CordovaPlugin {
           }
         });
       }
+      else if (action.equals("getInitialPushPayload")) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+          public void run() {
+            try {
+              Map<String, Object> payload = consumeInitialPushPayload();
+              if (payload == null) {
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, (String) null));
+                return;
+              }
+              callbackContext.success(toJSONObject(payload));
+            } catch (Exception e) {
+              Log.d(TAG, "Error retrieving initial push payload: " + e.getMessage());
+              callbackContext.error(e.getMessage());
+            }
+          }
+        });
+      }
       else if (action.equals("hasPermission")) {
         this.hasPermission(callbackContext);
       } 
@@ -317,10 +361,7 @@ public class FCMPlugin extends CordovaPlugin {
   public static void sendPushPayload(Map<String, Object> payload) {
     Log.d(TAG, "sendPushPayload");
     try {
-      JSONObject jo = new JSONObject();
-      for (String key : payload.keySet()) {
-        jo.put(key, payload.get(key));
-      }
+      JSONObject jo = toJSONObject(payload);
       String callBack = "javascript:" + notificationCallBack + "(" + jo.toString() + ")";
       if (notificationCallBackReady && gWebView != null) {
         Log.d(TAG, "Sent Push Notification to view: " + callBack);
@@ -367,6 +408,7 @@ public class FCMPlugin extends CordovaPlugin {
           data.put(key, value);
         }
       }
+      FCMPlugin.setInitialPushPayload(data);
       FCMPlugin.sendPushPayload(data);
     }
   }
