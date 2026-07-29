@@ -26,6 +26,11 @@ FCMPlugin.prototype.getToken = function( success, error ){
 	exec(success, error, "FCMPlugin", 'getToken', []);
 }
 
+// GET INITIAL PUSH PAYLOAD //
+FCMPlugin.prototype.getInitialPushPayload = function( success, error ){
+	exec(success, error, "FCMPlugin", 'getInitialPushPayload', []);
+}
+
 FCMPlugin.prototype.hasPermission = function (success, error) {
     exec(success, error, "FCMPlugin", "hasPermission", []);
 };

@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 13.2.0 (05/28/2026)
+- Added `getInitialPushPayload()` for one-shot retrieval of the tapped push that opened the app
+- Added native initial push buffering on iOS and Android so cold-start routing can be decided in app code
+
 ### Version 13.1.0 (09/07/2025)
 - Upgraded Android Firebase BOM to 32.8.1
 

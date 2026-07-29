@@ -2,8 +2,7 @@
 > Extremely easy plug&play push notification plugin for Cordova applications with Google Firebase FCM.
 
 ## This is a fork of a fork of a fork ...
-This is only developed to support our projects
-
+This is only developed to support our projects. It's based on version 8 from [cmgustavo/cordova-plugin-fcm](https://github.com/cmgustavo/cordova-plugin-fcm). With compatibility to cordova ios 8 and codova android 15
 
 ## Installation
 Make sure you have ‘google-services.json’ for Android or  ‘GoogleService-Info.plist’ for iOS in your Cordova project root folder. You don´t need to configure anything else in order to have push notification working for both platforms, everything is magic.
@@ -50,6 +49,24 @@ FCMPluginNG.getToken(function(token){
 });
 ```
 
+#### Get initial push payload
+
+```javascript
+//FCMPluginNG.getInitialPushPayload( successCallback(data), errorCallback(err) );
+//Returns the full payload of the notification tap that opened the app.
+//The payload is consumed on first read, so call this as early as possible after deviceready.
+FCMPluginNG.getInitialPushPayload(function(data){
+    if (!data) {
+        return;
+    }
+
+    // Evaluate the full payload in your app code and decide where to route.
+    // This keeps the plugin generic and avoids coupling native code to a
+    // single property like "untrackedUri".
+    alert(JSON.stringify(data));
+});
+```
+
 #### Subscribe to topic
 
 ```javascript
@@ -79,6 +96,24 @@ FCMPluginNG.onNotification(function(data){
       //Notification was received in foreground. Maybe the user needs to be notified.
       alert( JSON.stringify(data) );
     }
+});
+```
+
+#### Recommended cold-start order
+
+```javascript
+document.addEventListener("deviceready", function () {
+    FCMPluginNG.getInitialPushPayload(function (data) {
+        if (data && data.wasTapped) {
+            // Resolve your target route here before loading the rest of the app.
+        }
+    });
+
+    FCMPluginNG.onNotification(function (data) {
+        if (data.wasTapped) {
+            // Handle taps while the app is already running.
+        }
+    });
 });
 ```
 
