@@ -2,8 +2,7 @@
 > Extremely easy plug&play push notification plugin for Cordova applications with Google Firebase FCM.
 
 ## This is a fork of a fork of a fork ...
-This is only developed to support our projects
-
+This is only developed to support our projects. It's based on version 8 from [cmgustavo/cordova-plugin-fcm](https://github.com/cmgustavo/cordova-plugin-fcm). With compatibility to cordova ios 8 and codova android 15
 
 ## Installation
 Make sure you have ‘google-services.json’ for Android or  ‘GoogleService-Info.plist’ for iOS in your Cordova project root folder. You don´t need to configure anything else in order to have push notification working for both platforms, everything is magic.
