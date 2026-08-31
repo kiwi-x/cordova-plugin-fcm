@@ -33,13 +33,17 @@
     <!-- <engine name="cordova-android" version=">=9.0.0" /> -->
     <engine name="cordova" version=">=10.0.0"/>
     <engine name="cordova-android" version=">=11.0.0"/>
-    <engine name="cordova-ios" version=">=6.0.0"/>
+    <engine name="cordova-ios" version=">=8.0.0"/>
   </engines>
 
   <!-- ANDROID CONFIGURATION -->
   <platform name="android">
 
-    <preference name="ANDROID_FIREBASE_BOM_VERSION" default="32.8.1" />
+    <preference name="ANDROID_FIREBASE_BOM_VERSION" default="34.18.0" />
+
+    <config-file target="config.xml" parent="/*">
+      <preference name="GradlePluginKotlinEnabled" value="true" />
+    </config-file>
 
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <activity android:exported="true" android:name="com.gae.scaffolder.plugin.FCMPluginActivity"
@@ -66,17 +70,15 @@
     <framework src="com.google.firebase:firebase-bom:$ANDROID_FIREBASE_BOM_VERSION" />
     <framework src="src/android/FCMPlugin.gradle" custom="true" type="gradleReference" />
 
-    <source-file src="src/android/FCMPlugin.java" target-dir="src/com/gae/scaffolder/plugin" />
-    <source-file src="src/android/MyFirebaseMessagingService.java"
-      target-dir="src/com/gae/scaffolder/plugin" />
-    <source-file src="src/android/FCMPluginActivity.java" target-dir="src/com/gae/scaffolder/plugin" />
+    <source-file src="src/android/FCMPlugin.kt" target-dir="src/main/kotlin/com/gae/scaffolder/plugin" />
+    <source-file src="src/android/MyFirebaseMessagingService.kt"
+      target-dir="src/main/kotlin/com/gae/scaffolder/plugin" />
+    <source-file src="src/android/FCMPluginActivity.kt" target-dir="src/main/kotlin/com/gae/scaffolder/plugin" />
   </platform>
 
   <!-- IOS CONFIGURATION -->
-  <platform name="ios">
+  <platform name="ios" package="swift">
 
-    <preference name="IOS_FIREBASE_POD_VERSION" default="10.24.0" />
-    
     <config-file target="config.xml" parent="/*">
       <feature name="FCMPlugin">
         <param name="ios-package" value="FCMPlugin" />
@@ -102,33 +104,7 @@
     <resource-file src="src/ios/Assets/GoogleService-Info.plist"
       target="Resources/GoogleService-Info.plist" />
 
-    <header-file src="src/ios/FCMPlugin.h" />
-    <source-file src="src/ios/FCMPlugin.m" />
-
-    <header-file src="src/ios/AppDelegate+FCMPlugin.h" />
-    <source-file src="src/ios/AppDelegate+FCMPlugin.m" />
-
-    <!-- FIREBASE COCOA PODS (not for the moment)-->
-    <!-- <framework src="Firebase/Messaging" type="podspec" spec="~> 0"/> -->
-    <!-- <podspec>
-			<config>
-        <source url="https://github.com/CocoaPods/Specs.git"/>
-			</config>
-			<pods>
-				<pod name="Firebase/Messaging" spec="= 7.9.0" />
-			</pods>
-		</podspec> -->
-
-    <podspec>
-      <config>
-        <!-- source url="https://github.com/CocoaPods/Specs.git" /-->
-        <source url="https://cdn.cocoapods.org/"/>
-      </config>
-      <!-- <pods> -->
-      <pods use-frameworks="true">
-        <pod name="Firebase/Messaging" spec="$IOS_FIREBASE_POD_VERSION" />
-      </pods>
-    </podspec>
+    <source-file src="src/ios/FCMPlugin.swift" />
 
   </platform>
 
